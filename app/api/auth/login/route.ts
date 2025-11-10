@@ -16,32 +16,24 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       )
     }
-
-    // Find user
     const user = await User.findOne({ email: email.toLowerCase() })
     if (!user) {
       return NextResponse.json({ success: false, error: { message: "Invalid credentials" } }, { status: 401 })
     }
-
-    // Check password
     const isValidPassword = await user.comparePassword(password)
     if (!isValidPassword) {
       return NextResponse.json({ success: false, error: { message: "Invalid credentials" } }, { status: 401 })
     }
-
-    // Check if user is active
     if (user.status !== "active") {
       return NextResponse.json({ success: false, error: { message: "Account is suspended" } }, { status: 403 })
     }
 
-    // Create JWT token
     const token = await createToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
     })
 
-    // Set cookie
     await setAuthCookie(token)
 
     return NextResponse.json({

@@ -19,8 +19,6 @@ export async function GET(
         { status: 404 }
       );
     }
-
-    // Check authorization
     if (
       property.status !== "approved" &&
       session?.role !== "landlord" &&
